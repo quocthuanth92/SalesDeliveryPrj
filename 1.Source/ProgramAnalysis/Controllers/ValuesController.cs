@@ -1,5 +1,4 @@
-﻿using ProgramAnalysis.Gateway;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -39,28 +38,5 @@ namespace ProgramAnalysis.Controllers
         public void Delete(int id)
         {
         }
-
-        #region Device Management
-        // POST api/values
-        public void SetOnLight(MessModelValue value)
-        {
-            if (Gateway.Gateway.client.IsConnected)
-            {
-                if (value.CommandType == ConstParam.Type.OnOff.ToString())
-                {
-                    Gateway.Gateway.client.Publish(ConstParam.PrefixTopic.Action.ToString(), Encoding.UTF8.GetBytes("ping"));
-                }
-            }
-        }
-        // POST api/values
-        public void SetOffLight(MessModelValue value)
-        {
-            if (value.CommandType == ConstParam.Type.OnOff.ToString())
-            {
-                byte[] ping = new byte[] { 0x03, 0x01, 0x00 };
-                Gateway.Gateway.client.Publish(ConstParam.PrefixTopic.Action.ToString(), Encoding.UTF8.GetBytes("ping"));
-            }
-        }
-        #endregion
     }
 }

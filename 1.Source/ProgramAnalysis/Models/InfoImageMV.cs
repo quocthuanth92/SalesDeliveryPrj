@@ -15,11 +15,9 @@ namespace ProgramAnalysis.Models
         [Display(Name = "Image path:")]
         public string ImagePath { get; set; }
         public List<ExifTag> ResultImage { get; set; }
-        public List<ImageInfoMark> ListItem { get; set; }
         public InfoImageMV()
         {
             this.ResultImage = new List<ExifTag>();
-            this.ListItem = new List<ImageInfoMark>();
         }
     }
 }
