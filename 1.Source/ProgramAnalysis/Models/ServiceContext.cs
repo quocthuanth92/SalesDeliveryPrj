@@ -17,7 +17,7 @@ namespace ProgramAnalysis.Models
                 if (!HttpContext.Current.Items.Contains(ocKey))
                 {
                     var a = new ContextDataContext();
-                    a.CommandTimeout = Utility.StoreTimeOut;
+                    a.CommandTimeout = 30;
                     HttpContext.Current.Items.Add(ocKey, a);
                 }
                 return HttpContext.Current.Items[ocKey] as ContextDataContext;

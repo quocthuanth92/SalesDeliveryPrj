@@ -10,7 +10,6 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Drawing;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
 namespace ProgramAnalysis.Controllers
 {
@@ -31,7 +30,7 @@ namespace ProgramAnalysis.Controllers
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            string root = Utility.PathImage;
+            string root = "";
             string path = root + "/" + today.ToString("MM-dd-yyyy");
             if (!Directory.Exists(path))
             {
