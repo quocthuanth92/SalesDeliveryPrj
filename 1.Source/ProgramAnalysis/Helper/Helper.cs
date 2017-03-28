@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace ProgramAnalysis.Helper
 {
+
     public static class CultureHelper
     {
         // Valid cultures
@@ -100,4 +104,85 @@ namespace ProgramAnalysis.Helper
 
 
     }
+
+    public static class Helper
+    {
+        public static object GetPropertyValue(object ob, string propertyName)
+        {
+            return ob.GetType().GetProperties().Single(pi => pi.Name == propertyName).GetValue(ob, null);
+        }
+
+        static async Task InvokeAPIOrdersSuggest(object data)
+        {
+            using (var client = new HttpClient())
+            {
+                var scoreRequest = new
+                {
+
+                    Inputs = new Dictionary<string, StringTable>() {
+                        {
+                            "input1",
+                            new StringTable()
+                            {
+                                ColumnNames = new string[] {"age", "education", "marital-status", "relationship", "race", "sex"},
+                                Values = new string[,] {
+                                    { "40", "Bachelors", "Divorced", "Wife", "Black", "Male" },
+                                    { "20", "Bachelors", "Divorced", "Wife", "White", "Women" },
+                                    { "30", "Bachelors", "Married-civ-spouse", "Husband", "Asian-Pac-Islander", "Male" },
+                                    { "30", "Bachelors", "Married-civ-spouse", "Husband", "Asian-Pac-Islander", "Male" },
+                                    { "30", "Bachelors", "Divorced", "Husband", "Asian-Pac-Islander", "Male" },
+                                    { "30", "Bachelors", "Married-civ-spouse", "Husband", "White", "Male" },
+                                    { "30", "Bachelors", "Divorced", "Wife", "Asian-Pac-Islander", "Women" },
+                                }
+                            }
+                        },
+                    },
+                    GlobalParameters = new Dictionary<string, string>()
+                    {
+                    }
+                };
+
+                data = scoreRequest;
+                const string apiKey = "BAhf2KtIqrgU41mSXOTOkEf/g3TPCpI4UhYzbY63CvB2HvtX2gv1M9X8VrwLd2GSkl5Md4ui3/0WUUV8a2UFXw=="; // Replace this with the API key for the web service
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
+                client.BaseAddress = new Uri("https://ussouthcentral.services.azureml.net/workspaces/34f35554193945e6a8dc34547d8ce582/services/995daf0093324c42a6f1988a0498c180/execute?api-version=2.0&details=true");
+
+                // WARNING: The 'await' statement below can result in a deadlock if you are calling this code from the UI thread of an ASP.Net application.
+                // One way to address this would be to call ConfigureAwait(false) so that the execution does not attempt to resume on the original context.
+                // For instance, replace code such as:
+                //      result = await DoSomeTask()
+                // with the following:
+                //      result = await DoSomeTask().ConfigureAwait(false)
+
+
+                HttpResponseMessage response = await client.PostAsJsonAsync("", scoreRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string result = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Result: {0}", result);
+                }
+                else
+                {
+                    Console.WriteLine(string.Format("The request failed with status code: {0}", response.StatusCode));
+
+                    // Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
+                    Console.WriteLine(response.Headers.ToString());
+
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(responseContent);
+                }
+            }
+            Console.ReadLine();
+        }
+    }
+
+    #region RegisterClass
+    public class StringTable
+    {
+        public string[] ColumnNames { get; set; }
+        public string[,] Values { get; set; }
+    }
+    #endregion
 }
